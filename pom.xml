@@ -15,6 +15,7 @@
     <modules>
         <module>exposed-er-core</module>
         <module>exposed-er-reflection</module>
+        <module>exposed-er-maven-plugin</module>
     </modules>
 
     <properties>
@@ -23,6 +24,8 @@
         <junit.version>5.11.4</junit.version>
         <exposed.version>1.2.0</exposed.version>
         <classgraph.version>4.8.179</classgraph.version>
+        <maven.version>3.9.9</maven.version>
+        <maven-plugin-tools.version>3.15.2</maven-plugin-tools.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -90,7 +90,7 @@ class SchemaExtractor {
     private fun extractIndices(table: Table): List<IndexInfo> =
         table.indices.map { index ->
             IndexInfo(
-                name = index.indexName,
+                name = index.customName,
                 columns = index.columns.map { it.name },
                 unique = index.unique
             )
