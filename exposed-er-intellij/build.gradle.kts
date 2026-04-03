@@ -20,7 +20,7 @@ dependencies {
     implementation("io.github.massimodeiana:exposed-er-core:0.1.0-SNAPSHOT")
 
     intellijPlatform {
-        intellijIdeaCommunity("2025.1")
+        intellijIdea("2025.3.4")
         bundledPlugin("org.jetbrains.kotlin")
         testFramework(TestFrameworkType.Platform)
     }
@@ -34,6 +34,7 @@ intellijPlatform {
         name = "Exposed ER Diagram"
         version = project.version.toString()
     }
+    buildSearchableOptions = false
 }
 
 kotlin {

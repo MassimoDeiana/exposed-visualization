@@ -7,10 +7,41 @@ import io.github.massimodeiana.exposed.er.core.model.*
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.*
 
+data class DiscoveredTable(
+    val objectName: String,
+    val tableName: String,
+    val packageName: String,
+    val declaration: KtObjectDeclaration
+)
+
 class PsiSchemaExtractor {
 
-    fun extract(project: Project): SchemaInfo {
-        val tableObjects = findTableObjects(project)
+    fun discoverTables(project: Project, scope: GlobalSearchScope? = null): List<DiscoveredTable> {
+        val searchScope = scope ?: GlobalSearchScope.projectScope(project)
+        val ktFiles = FileTypeIndex.getFiles(KotlinFileType.INSTANCE, searchScope)
+        return ktFiles.mapNotNull { vf ->
+            com.intellij.psi.PsiManager.getInstance(project).findFile(vf) as? KtFile
+        }.flatMap { file ->
+            findTableObjectsInFile(file).map { obj ->
+                DiscoveredTable(
+                    objectName = obj.name ?: "unknown",
+                    tableName = extractTableName(obj),
+                    packageName = file.packageFqName.asString(),
+                    declaration = obj
+                )
+            }
+        }
+    }
+
+    fun extractFromDiscovered(tables: List<DiscoveredTable>): SchemaInfo {
+        val objects = tables.map { it.declaration }
+        val tableInfos = objects.map { extractTable(it) }
+        val relationships = objects.flatMap { extractRelationships(it, objects) }
+        return SchemaInfo(tableInfos, relationships)
+    }
+
+    fun extract(project: Project, packageFilter: String? = null): SchemaInfo {
+        val tableObjects = findTableObjects(project, packageFilter)
         val tables = tableObjects.map { extractTable(it) }
         val relationships = tableObjects.flatMap { extractRelationships(it, tableObjects) }
         return SchemaInfo(tables, relationships)
@@ -23,11 +54,18 @@ class PsiSchemaExtractor {
         return SchemaInfo(tables, relationships)
     }
 
-    private fun findTableObjects(project: Project): List<KtObjectDeclaration> {
+    private fun findTableObjects(project: Project, packageFilter: String? = null): List<KtObjectDeclaration> {
         val scope = GlobalSearchScope.projectScope(project)
         val ktFiles = FileTypeIndex.getFiles(KotlinFileType.INSTANCE, scope)
         return ktFiles.mapNotNull { vf ->
             com.intellij.psi.PsiManager.getInstance(project).findFile(vf) as? KtFile
+        }.filter { file ->
+            if (packageFilter.isNullOrBlank()) true
+            else file.packageFqName.asString().let { pkg ->
+                packageFilter.split(",").map { it.trim() }.any { filter ->
+                    pkg == filter || pkg.startsWith("$filter.")
+                }
+            }
         }.flatMap { findTableObjectsInFile(it) }
     }
 
