@@ -43,9 +43,19 @@ class ErDiagramToolWindowFactory : ToolWindowFactory, DumbAware {
 
         val updater = DiagramUpdater(project, diagramPanel, tree, rootNode)
 
+        var batchUpdate = false
+        var pendingUpdate = false
+
         tree.addCheckboxTreeListener(object : com.intellij.ui.CheckboxTreeListener {
             override fun nodeStateChanged(node: CheckedTreeNode) {
-                updater.updateDiagramFromSelection()
+                if (batchUpdate) return
+                if (!pendingUpdate) {
+                    pendingUpdate = true
+                    SwingUtilities.invokeLater {
+                        pendingUpdate = false
+                        updater.updateDiagramFromSelection()
+                    }
+                }
             }
         })
 
@@ -73,18 +83,22 @@ class ErDiagramToolWindowFactory : ToolWindowFactory, DumbAware {
 
         val selectAllAction = object : AnAction("Select All", "Select all tables", AllIcons.Actions.Selectall) {
             override fun actionPerformed(e: AnActionEvent) {
+                batchUpdate = true
                 setAllChecked(rootNode, true)
                 (tree.model as DefaultTreeModel).nodeChanged(rootNode)
                 tree.repaint()
+                batchUpdate = false
                 updater.updateDiagramFromSelection()
             }
         }
 
         val deselectAllAction = object : AnAction("Deselect All", "Deselect all tables", AllIcons.Actions.Unselectall) {
             override fun actionPerformed(e: AnActionEvent) {
+                batchUpdate = true
                 setAllChecked(rootNode, false)
                 (tree.model as DefaultTreeModel).nodeChanged(rootNode)
                 tree.repaint()
+                batchUpdate = false
                 updater.updateDiagramFromSelection()
             }
         }
