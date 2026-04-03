@@ -1,5 +1,6 @@
 package io.github.massimodeiana.exposed.er.intellij.toolwindow
 
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.ui.jcef.JBCefBrowser
 import java.awt.BorderLayout
 import java.io.File
@@ -37,6 +38,15 @@ class ErDiagramPanel : JPanel(BorderLayout()) {
     }
 
     fun updateDiagram(mermaidCode: String) {
+        val isDark = EditorColorsManager.getInstance().isDarkEditor
+        val theme = if (isDark) "dark" else "default"
+
+        browser.cefBrowser.executeJavaScript(
+            "setTheme(\"$theme\")",
+            browser.cefBrowser.url,
+            0
+        )
+
         val escaped = mermaidCode
             .replace("\\", "\\\\")
             .replace("\"", "\\\"")

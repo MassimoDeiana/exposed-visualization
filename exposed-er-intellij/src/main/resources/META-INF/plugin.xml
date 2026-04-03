@@ -14,6 +14,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Exposed ER Diagram"
                     anchor="right"
+                    icon="/icons/erDiagram.svg"
                     factoryClass="io.github.massimodeiana.exposed.er.intellij.toolwindow.ErDiagramToolWindowFactory"/>
     </extensions>
 
@@ -21,6 +22,7 @@
         <action id="ExposedEr.Generate"
                 class="io.github.massimodeiana.exposed.er.intellij.actions.GenerateErDiagramAction"
                 text="Generate Exposed ER Diagram"
+                icon="/icons/erDiagram.svg"
                 description="Generate ER diagram from Exposed table definitions">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
