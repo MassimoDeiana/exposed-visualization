@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.massimodeiana</groupId>
         <artifactId>exposed-visualization</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
 
     <artifactId>exposed-er-core</artifactId>
