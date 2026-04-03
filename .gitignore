@@ -1,7 +1,20 @@
+# Maven
 target/
+
+# Gradle
+build/
+.gradle/
+.intellijPlatform/
+
+# IDE
 *.iml
 .idea/
+
+# OS
+.DS_Store
 .nwave/
+
+# Build artifacts
 *.class
 *.jar
 *.log
